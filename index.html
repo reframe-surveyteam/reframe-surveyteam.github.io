@@ -106,6 +106,8 @@ legend + * { clear: both; }
 .block .block > legend { font-size: .97rem; font-weight: 700; color: var(--ink); }
 .hint, .description { color: var(--muted); font-size: .9rem; }
 .hint { margin: 0 0 12px; }
+.swap-link { margin: 40px 0 0; font-size: .75rem; color: var(--muted); opacity: .8; }
+.swap-link a { color: inherit; }
 label strong, .description { display: block; }
 label strong { font-weight: 700; }
 .description { margin-top: 2px; font-size: .84rem; color: var(--subtle); line-height: 1.5; }
@@ -287,6 +289,7 @@ footer { color: var(--subtle); padding: 20px 4px; text-align: center; font-size:
       <section id="done" hidden>
         <h1 tabindex="-1" id="done-title"></h1>
         <p class="lead" id="done-copy"></p>
+        <p class="swap-link" id="swap-link" hidden><a href="https://surveyswap.io/sr/EBZV-J8WQ-G4TK" target="_blank" rel="noopener">SurveySwap으로 참여하신 분은 여기를 눌러 완료를 확인해 주세요.</a></p>
       </section>
     </main>
     <footer id="preview-notice">미리보기 · 제출해도 실제 응답은 저장되지 않아요.</footer>
@@ -623,6 +626,7 @@ Q19. 차를 사거나 평소 이동하는 방법을 바꾸기 위해서 어떤 �
 마지막으로|One last question|Para terminar|Zum Schluss|Pour finir
 선택|Select|Seleccionar|Auswählen|Choisir
 기타|Other|Otro|Sonstiges|Autre
+SurveySwap으로 참여하신 분은 여기를 눌러 완료를 확인해 주세요.|If you came from SurveySwap, click here to confirm your completion.|Si vienes de SurveySwap, haz clic aquí para confirmar que terminaste.|Wenn Sie über SurveySwap teilnehmen, klicken Sie hier, um den Abschluss zu bestätigen.|Si vous venez de SurveySwap, cliquez ici pour confirmer votre participation.
 Q8에서 ‘잘 모름’을 고른 대상은 회색으로 표시되며, 점수 칸을 비워 두거나 점수를 입력할 수 있습니다. 판단하기 어려운 항목에는 ? 를 골라 주세요.|Brands marked “Not familiar” in Q8 are shown in gray; you can leave them blank or enter scores. Choose ? for any criterion that is hard to judge.|Las marcas que marcaste como «No lo conozco» en la P8 aparecen en gris; puedes dejarlas en blanco o puntuarlas. Elige ? en los criterios difíciles de valorar.|In F8 als „Nicht bekannt“ markierte Marken werden grau dargestellt; Sie können sie leer lassen oder Punkte vergeben. Wählen Sie ?, wenn ein Kriterium schwer zu beurteilen ist.|Les marques marquées « Je ne connais pas » à la Q8 apparaissent en gris ; vous pouvez les laisser vides ou les noter. Choisissez ? pour tout critère difficile à évaluer.
 Q13. 이동수단을 고를 때 가장 중요한 기준 3개를 순서대로 골라 주세요.|Q13. Choose the three most important criteria when choosing how to travel, in order.|P13. Elige, en orden, los tres criterios más importantes al elegir un medio de transporte.|F13. Wählen Sie der Reihe nach die drei wichtigsten Kriterien bei der Wahl eines Verkehrsmittels.|Q13. Choisissez, dans l’ordre, les trois critères les plus importants pour choisir un mode de déplacement.
 Q13. 이동수단을 고를 때 어떤 기준이 가장 중요한가요?|Q13. Which criteria matter most to you when choosing how to travel?|P13. ¿Qué criterios son los más importantes para ti al elegir un medio de transporte?|F13. Welche Kriterien sind Ihnen bei der Wahl eines Verkehrsmittels am wichtigsten?|Q13. Quels critères comptent le plus pour vous dans le choix d’un mode de déplacement ?
@@ -1339,7 +1343,11 @@ $("next").addEventListener("click", async () => {
   $("form-error").hidden = true;
   if (!validateStep(sections[stepIndex])) return;
   if (stepIndex < titles.length - 1) return showStep(stepIndex + 1);
-  if (preview) return end("미리보기를 마쳤어요.", "테스트 응답은 저장되지 않았어요.");
+  if (preview) {
+    end("미리보기를 마쳤어요.", "테스트 응답은 저장되지 않았어요.");
+    $("swap-link").hidden = false;
+    return;
+  }
   pending = true;
   $("back").disabled = $("next").disabled = true;
   setCopy("next", "제출하는 중…");
@@ -1348,6 +1356,7 @@ $("next").addEventListener("click", async () => {
     submissionId ||= crypto.randomUUID();
     await post({version: 7, id: submissionId, token: crypto.randomUUID(), consent: true, answers: collect()});
     end("설문을 마쳤습니다.", "끝까지 함께해 주셔서 감사합니다.");
+    $("swap-link").hidden = false;
   } catch {
     setCopy("form-error", "응답 저장을 확인하지 못했어요. 입력한 답변은 화면에 남아 있으니 잠시 후 다시 제출해 주세요.");
     $("form-error").hidden = false;
