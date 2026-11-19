@@ -626,6 +626,8 @@ Q19. 차를 사거나 평소 이동하는 방법을 바꾸기 위해서 어떤 �
 마지막으로|One last question|Para terminar|Zum Schluss|Pour finir
 선택|Select|Seleccionar|Auswählen|Choisir
 기타|Other|Otro|Sonstiges|Autre
+Q8에서 ‘잘 모름’을 고른 대상은 회색으로 표시되고 평가에서 제외됩니다. 판단하기 어려운 항목에는 ? 를 골라 주세요.|Brands marked “Not familiar” in Q8 are shown in gray and excluded from rating. Choose ? for any criterion that is hard to judge.|Las marcas que marcaste como «No lo conozco» en la P8 aparecen en gris y no se evalúan. Elige ? en los criterios difíciles de valorar.|In F8 als „Nicht bekannt“ markierte Marken werden grau dargestellt und nicht bewertet. Wählen Sie ?, wenn ein Kriterium schwer zu beurteilen ist.|Les marques marquées « Je ne connais pas » à la Q8 apparaissent en gris et ne sont pas évaluées. Choisissez ? pour tout critère difficile à évaluer.
+Q8에서 ‘잘 모름’을 고른 대상은 종합 평가에서 제외됩니다.|The overall score is skipped for brands marked “Not familiar” in Q8.|Se omite la puntuación global de las marcas que marcaste como «No lo conozco» en la P8.|Für in F8 als „Nicht bekannt“ markierte Marken entfällt die Gesamtbewertung.|La note globale est ignorée pour les marques marquées « Je ne connais pas » à la Q8.
 SurveySwap으로 참여하신 분은 여기를 눌러 완료를 확인해 주세요.|If you came from SurveySwap, click here to confirm your completion.|Si vienes de SurveySwap, haz clic aquí para confirmar que terminaste.|Wenn Sie über SurveySwap teilnehmen, klicken Sie hier, um den Abschluss zu bestätigen.|Si vous venez de SurveySwap, cliquez ici pour confirmer votre participation.
 Q8에서 ‘잘 모름’을 고른 대상은 회색으로 표시되며, 점수 칸을 비워 두거나 점수를 입력할 수 있습니다. 판단하기 어려운 항목에는 ? 를 골라 주세요.|Brands marked “Not familiar” in Q8 are shown in gray; you can leave them blank or enter scores. Choose ? for any criterion that is hard to judge.|Las marcas que marcaste como «No lo conozco» en la P8 aparecen en gris; puedes dejarlas en blanco o puntuarlas. Elige ? en los criterios difíciles de valorar.|In F8 als „Nicht bekannt“ markierte Marken werden grau dargestellt; Sie können sie leer lassen oder Punkte vergeben. Wählen Sie ?, wenn ein Kriterium schwer zu beurteilen ist.|Les marques marquées « Je ne connais pas » à la Q8 apparaissent en gris ; vous pouvez les laisser vides ou les noter. Choisissez ? pour tout critère difficile à évaluer.
 Q13. 이동수단을 고를 때 가장 중요한 기준 3개를 순서대로 골라 주세요.|Q13. Choose the three most important criteria when choosing how to travel, in order.|P13. Elige, en orden, los tres criterios más importantes al elegir un medio de transporte.|F13. Wählen Sie der Reihe nach die drei wichtigsten Kriterien bei der Wahl eines Verkehrsmittels.|Q13. Choisissez, dans l’ordre, les trois critères les plus importants pour choisir un mode de déplacement.
@@ -1069,7 +1071,7 @@ function comparison(index) {
       for (const matrix of [grid, total]) {
         for (const input of matrix.querySelectorAll('[data-column="' + column + '"]')) {
           const unfamiliar = control.value === "잘 모름";
-          input.disabled = index === 1 && unfamiliar;
+          input.disabled = unfamiliar;
           input.classList.toggle("unfamiliar", index === 0 && unfamiliar);
           input.required = !unfamiliar;
         }
@@ -1086,12 +1088,12 @@ function comparison(index) {
     block(index === 0 ? "Q10. 각 브랜드가 아래 기준을 얼마나 잘 갖추고 있나요?" : "Q14. 각 이동 방법에 아래 문장이 얼마나 해당하나요?", [
       copy(touchRatings ? "각 칸을 눌러 점수를 골라 주세요." : index === 0 ? "각 칸에 1~5 또는 ?를 적어 주세요." : "각 칸에 1~5 또는 ?를 입력해 주세요. Tab 키로 다음 칸으로 이동할 수 있습니다."),
       copy("각 대상을 따로 평가해 주세요. 비용과 부담은 적을수록 높은 점수입니다."),
-      copy(index === 0 ? "Q8에서 ‘잘 모름’을 고른 대상은 회색으로 표시되며, 점수 칸을 비워 두거나 점수를 입력할 수 있습니다. 판단하기 어려운 항목에는 ? 를 골라 주세요." : "앞에서 ‘잘 모름’을 고른 대상은 회색으로 표시되고 평가에서 제외됩니다. 판단하기 어려운 항목에는 ? 를 골라 주세요."),
+      copy(index === 0 ? "Q8에서 ‘잘 모름’을 고른 대상은 회색으로 표시되고 평가에서 제외됩니다. 판단하기 어려운 항목에는 ? 를 골라 주세요." : "앞에서 ‘잘 모름’을 고른 대상은 회색으로 표시되고 평가에서 제외됩니다. 판단하기 어려운 항목에는 ? 를 골라 주세요."),
       scale, grid
     ]),
     block(index === 0 ? "Q11. 지금 차를 고른다면, 각 브랜드는 얼마나 좋은 선택인가요?" : "Q15. Q1의 이동을 해결하는 방법으로서, 각 방법은 얼마나 좋은 선택인가요?", [
       copy(index === 0 ? "0 전혀 고르고 싶지 않음 · 10 매우 만족스러운 선택" : "0 전혀 아님 · 10 매우 좋은 선택"),
-      copy(index === 0 ? "Q8에서 ‘잘 모름’을 고른 대상은 점수 칸을 비워 두거나 점수를 입력할 수 있습니다." : "앞에서 ‘잘 모름’을 고른 대상은 종합 평가에서 제외됩니다."),
+      copy(index === 0 ? "Q8에서 ‘잘 모름’을 고른 대상은 종합 평가에서 제외됩니다." : "앞에서 ‘잘 모름’을 고른 대상은 종합 평가에서 제외됩니다."),
       total
     ])
   ];
