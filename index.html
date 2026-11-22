@@ -110,6 +110,8 @@ legend + * { clear: both; }
 .swap-link a { color: inherit; }
 label strong, .description { display: block; }
 label strong { font-weight: 700; }
+.q1-recall { margin: 4px 0 12px; padding: 8px 12px; border-radius: 10px; background: var(--soft); border: 1px solid var(--line); font-size: .8rem; line-height: 1.55; color: var(--subtle); }
+.q1-recall strong { display: block; color: var(--muted); font-weight: 700; }
 .description { margin-top: 2px; font-size: .84rem; color: var(--subtle); line-height: 1.5; }
 
 /* ---------- choices ---------- */
@@ -1092,6 +1094,7 @@ function comparison(index) {
       scale, grid
     ]),
     block(index === 0 ? "Q11. 지금 차를 고른다면, 각 브랜드는 얼마나 좋은 선택인가요?" : "Q15. Q1의 이동을 해결하는 방법으로서, 각 방법은 얼마나 좋은 선택인가요?", [
+      ...(index === 1 ? [q1Recall] : []),
       copy(index === 0 ? "0 전혀 고르고 싶지 않음 · 10 매우 만족스러운 선택" : "0 전혀 아님 · 10 매우 좋은 선택"),
       copy(index === 0 ? "Q8에서 ‘잘 모름’을 고른 대상은 종합 평가에서 제외됩니다." : "앞에서 ‘잘 모름’을 고른 대상은 종합 평가에서 제외됩니다."),
       total
@@ -1150,6 +1153,27 @@ const q3Options = [
   "지금 자가용을 쓰지 않고, 앞으로도 쓰지 않을 것임"
 ];
 const q3 = choices("q3", "Q3. 지금 자가용을 쓰고 있나요? 앞으로는 어떨 것 같나요?", q3Options);
+const q4 = choices("q4", "Q4. Q3로 응답한 가장 큰 이유를 골라 주세요.", ["지금 방법으로 충분함", "차를 사거나 계약할 목돈이 없음", "매달 나가는 돈", "운전하는 부담", "주차가 어려움", "정비·보험 등 관리가 번거로움", "이용할 일이 적음", "사고·고장이 걱정됨", "동행·짐 때문에 차가 필요함", "면허·건강 등 개인 사정", "이미지·취향 때문에", "환경을 생각해서", "기타", "특별한 이유 없음"], {other: true});
+// Q3에서 "계속 쓸 생각"을 고르면 Q4(떠나는 이유)를 건너뜀
+function updateCarReasons() {
+  const keepUsing = q3.querySelector("input:checked")?.value === "자가용을 쓰고 있고, 앞으로도 계속 쓸 생각임";
+  setQuestionVisible(q4, !keepUsing);
+}
+q3.addEventListener("change", updateCarReasons);
+q3.addEventListener("click", updateCarReasons);
+updateCarReasons();
+
+// Q15 아래에 Q1 질문과 응답자가 고른 답을 작게 보여 줌
+const q1Recall = make("div", {className: "q1-recall"});
+function updateQ1Recall() {
+  const picked = ["q1_purpose", "q1_frequency", "q1_distance", "q1_people", "q1_luggage"]
+    .flatMap(name => [...document.getElementsByName(name)].filter(input => input.checked).map(input => input.value));
+  const answers = make("span");
+  picked.forEach((value, i) => answers.append(...(i ? [" · "] : []), make("span", {textContent: value})));
+  q1Recall.replaceChildren(make("strong", {textContent: "Q1. 어떤 이동인가요?"}), answers);
+  q1Recall.hidden = !picked.length;
+  localize(q1Recall);
+}
 
 const q17 = choices("q17", "Q17. 다음에 차를 마련한다면 현대자동차를 후보에 넣을 생각이 있나요?", ["전혀 없음", "낮음", "보통", "높음", "매우 높음", "차를 마련할 생각 없음"]);
 const q18 = choices("q18", "Q18. Q17에서 현대자동차를 후보에 넣을 생각에 대해 그렇게 답한 가장 큰 이유를 최대 2개 골라 주세요.", [
@@ -1188,7 +1212,7 @@ const sections = [
       copy("대중교통·택시·카셰어링은 제외됩니다.", "", "span")
     ]),
     q3,
-    choices("q4", "Q4. Q3로 응답한 가장 큰 이유를 골라 주세요.", ["지금 방법으로 충분함", "차를 사거나 계약할 목돈이 없음", "매달 나가는 돈", "운전하는 부담", "주차가 어려움", "정비·보험 등 관리가 번거로움", "이용할 일이 적음", "사고·고장이 걱정됨", "동행·짐 때문에 차가 필요함", "면허·건강 등 개인 사정", "이미지·취향 때문에", "환경을 생각해서", "기타", "특별한 이유 없음"], {other: true})
+    q4
   ],
   [
     copy("Q2에서 고른 방법으로 최근 실제로 겪은 일을 떠올려 주세요.", "lead"),
@@ -1244,6 +1268,7 @@ function showStep(index) {
   form.hidden = index < 0;
   $("progress").hidden = index < 0;
   sections.forEach((section, i) => { section.hidden = index !== i; });
+  updateQ1Recall();
   $("form-error").hidden = true;
   if (index >= 0) {
     setCopy("step-label", (index + 1) + " / " + titles.length + " 단계");
